@@ -1,9 +1,15 @@
+import 'package:arabic_numbers/arabic_numbers.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:surah/Cubit/cubit/text_cubit.dart';
+import 'package:surah/components.dart';
 import 'package:surah/model/surah_arabic.dart';
 import 'package:surah/model/surah_model.dart';
-import 'package:surah/service/all_service.dart';
+import 'package:arabic_numbers/arabic_numbers.dart';
+import 'package:surah/screens/about_surah.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -14,17 +20,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   ScrollController _controller = ScrollController();
+
   AudioPlayer audioPlayer = AudioPlayer();
-  List plays = List.generate(300, (index) => false);
+  bool plays = false;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
+  List<SurahArabic>? snapAr;
+  List<SurahModelUzbek>? snapUz;
+
   @override
   void initState() {
     super.initState();
+    snapAr = Arabic.map((e) => SurahArabic.fromJson(e)).toList();
+    snapUz = surah.map((e) => SurahModelUzbek.fromJson(e)).toList();
     audioPlayer.onPlayerStateChanged.listen((event) {
-      for (var item in plays) {
-        plays[item] = event == PlayerState.PLAYING;
-      }
+      plays = event == PlayerState.PLAYING;
     });
 
     audioPlayer.onDurationChanged.listen((event) {
@@ -52,149 +62,307 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.green[900],
         title: const Text(
-          'Baqara surasi',
+          'Бақара сураси',
           style: TextStyle(fontSize: 20),
         ),
         actions: <Widget>[
           PopupMenuButton(
               onSelected: (e) async {
                 if (e == 1) {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AboutSurah()));
                 } else if (e == 2) {
+                  showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return BottomSheet(
+                          onClosing: () {},
+                          builder: (BuildContext context) {
+                            return BlocBuilder<TextCubit, double>(
+                                builder: (context, state) {
+                              return SizedBox(
+                                height: 250,
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 250,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: BouncingScrollPhysics(),
+                                        scrollDirection: Axis.vertical,
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            title: Text(
+                                              textSizeUzbek[index][0],
+                                              style: TextStyle(
+                                                  fontSize: textSizeUzbek[index]
+                                                      [1]),
+                                            ),
+                                            trailing: Text(
+                                              textSizeUzbek[index][1]
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize: textSizeUzbek[index]
+                                                      [1]),
+                                            ),
+                                            onTap: () {
+                                              context
+                                                  .read<TextCubit>()
+                                                  .setUzfontsize(
+                                                      textSizeUzbek[index][1]);
+                                            },
+                                          );
+                                        },
+                                        itemCount: textSizeUzbek.length,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            });
+                          });
+                    },
+                  );
+                } else if (e == 3) {
+                  showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return BottomSheet(
+                          onClosing: () {},
+                          builder: (BuildContext context) {
+                            return BlocBuilder<TextCubit, double>(
+                                builder: (context, state) {
+                              return SizedBox(
+                                height: 300,
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 300,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: BouncingScrollPhysics(),
+                                        scrollDirection: Axis.vertical,
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            title: Text(
+                                              textSizeArabic[index][0],
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      textSizeArabic[index][1]),
+                                            ),
+                                            trailing: Text(
+                                              textSizeArabic[index][1]
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      textSizeArabic[index][1]),
+                                            ),
+                                            onTap: () {
+                                              context
+                                                  .read<TextCubit>()
+                                                  .setArfontsize(
+                                                      textSizeArabic[index][1]);
+                                            },
+                                          );
+                                        },
+                                        itemCount: textSizeArabic.length,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            });
+                          });
+                    },
+                  );
+                } else if (e == 4) {
                   showDialog(
                       context: context,
                       builder: (context) {
                         return const AlertDialog(
                           content: Text(
-                            "Bu loyiha Foziljonov Abdulloh tomonidan 2022-yilda ishlab chiqildi",
+                            "Бу дастур 2022-йилда Фозилжонов Абдуллох томонидан ишлаб чикилди.Дастурда Шайх МухаммадСодык МухаммадЮсуф хазратларининг тафсирларидан  ва  Мишари Рашид Альафасининг тиловатыдан фойдаланилди.",
+                            style: TextStyle(fontSize: 20),
+                            textAlign: TextAlign.center,
                           ),
                         );
                       });
-                } else if (e == 3) {}
+                }
               },
               itemBuilder: (context) => [
                     const PopupMenuItem(
-                      child: Text("O'qish rejimi"),
+                      child: Text("Сура хакида"),
                       value: 1,
                     ),
                     const PopupMenuItem(
-                      child: Text("Sura haqida"),
+                      child: Text("Дастур хакида"),
+                      value: 4,
+                    ),
+                    const PopupMenuItem(
+                      child: Text("Узбек хажми "),
                       value: 2,
                     ),
                     const PopupMenuItem(
-                      child: Text("Sozlamalar"),
+                      child: Text("Арабий хажми "),
                       value: 3,
                     )
                   ])
         ],
       ),
       body: Scrollbar(
+        showTrackOnHover: true,
         controller: _controller,
         thickness: 10,
-        child: FutureBuilder(
-            future: Future.wait([
-              SurahService().fetchSurahArabic(),
-              SurahService().fetchSurahUzbek(),
-            ]),
-            builder: (context, AsyncSnapshot<List> snapshot) {
-              if (snapshot.hasError) {
-                print(snapshot.error);
-              }
-              if (snapshot.hasData) {
-                List<SurahModelUzbek>? snapUz = snapshot.data![1];
-                List<SurahArabic> snapAr = snapshot.data![0];
-                return ListView.builder(
-                    itemBuilder: (_, __) {
-                      return Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              color: Colors.orange.shade100,
+        child: BlocBuilder<TextCubit, double>(
+          builder: (context, state) {
+            var cubit = context.watch<TextCubit>();
+            return ListView.builder(
+                itemBuilder: (_, __) {
+                  ArabicNumbers arabicNumber = ArabicNumbers();
+                  return Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade100,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.green[900],
+                                child: IconButton(
+                                  onPressed: () async {
+                                    FlutterClipboard.copy(
+                                            snapAr![__].text.toString())
+                                        .then((value) {
+                                      Fluttertoast.showToast(
+                                        msg: "Copied",
+                                        toastLength: Toast.LENGTH_LONG,
+                                        fontSize: cubit.Arfontsize,
+                                      );
+                                    });
+                                  },
+                                  icon: const Icon(Icons.copy),
+                                  color: Colors.orange.shade100,
+                                ),
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: SelectableText(
+                                snapAr![__].text.toString(),
+                                style: TextStyle(
+                                  fontSize: cubit.Arfontsize,
+                                ),
+                                textAlign: TextAlign.end,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SelectableText(
+                              snapUz![__].text.toString(),
+                              style: TextStyle(
+                                fontSize: cubit.Uzfontsize,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                SelectableText(
-                                  snapAr[__].text.toString(),
-                                  style: const TextStyle(fontSize: 22),
-                                  textAlign: TextAlign.end,
-                                ),
-                                const SizedBox(height: 10),
-                                SelectableText(
-                                  snapUz![__].text.toString(),
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Card(
-                                      color: Colors.green[900],
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          snapAr[__].numberInSurah.toString(),
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white),
-                                        ),
+                                Visibility(
+                                  visible: snapAr![__].numberInSurah == 0
+                                      ? false
+                                      : true,
+                                  child: Card(
+                                    color: Colors.green[900],
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 6),
+                                      child: Text(
+                                        "${snapAr![__].numberInSurah.toString()} | ${arabicNumber.convert(snapAr![__].numberInSurah.toString())}",
+                                        style: const TextStyle(
+                                            fontSize: 16, color: Colors.white),
                                       ),
                                     ),
-                                    Wrap(
-                                      children: [
-                                        CircleAvatar(
-                                          backgroundColor: Colors.green[900],
-                                          child: IconButton(
-                                            onPressed: () async {
-                                              if (plays[__]) {
-                                                await audioPlayer.pause().then(
-                                                    (value) => setState(() {
-                                                          plays[__] = plays[__]
-                                                              ? false
-                                                              : true;
-                                                        }));
-                                              } else {
-                                                String url =
-                                                    snapAr[__].audio.toString();
-                                                await audioPlayer
-                                                    .play(url)
-                                                    .then(
-                                                      (value) => setState(
-                                                        () {
-                                                          plays[__] = plays[__]
-                                                              ? false
-                                                              : true;
-                                                        },
-                                                      ),
-                                                    );
-                                              }
-                                            },
-                                            icon: plays[__]
-                                                ? const Icon(Icons.pause)
-                                                : const Icon(Icons.play_arrow),
-                                            color: Colors.orange.shade100,
-                                          ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor: Colors.green[900],
+                                        child: IconButton(
+                                          onPressed: () async {
+                                            if (plays) {
+                                              await audioPlayer
+                                                  .pause()
+                                                  .then((value) => setState(() {
+                                                        plays = plays
+                                                            ? false
+                                                            : true;
+                                                      }));
+                                            } else {
+                                              String url =
+                                                  snapAr![__].audio.toString();
+                                              await audioPlayer.play(url).then(
+                                                    (value) => setState(
+                                                      () {
+                                                        plays = plays
+                                                            ? false
+                                                            : true;
+                                                      },
+                                                    ),
+                                                  );
+                                            }
+                                          },
+                                          icon: const Icon(Icons.play_arrow),
+                                          color: Colors.orange.shade100,
                                         ),
-                                      ],
-                                    ),
-                                  ],
+                                      ),
+                                      CircleAvatar(
+                                        backgroundColor: Colors.green[900],
+                                        child: IconButton(
+                                          onPressed: () async {
+                                            FlutterClipboard.copy(
+                                                    snapUz![__].text.toString())
+                                                .then((value) {
+                                              Fluttertoast.showToast(
+                                                msg: "Copied",
+                                                toastLength: Toast.LENGTH_LONG,
+                                                fontSize: 20,
+                                              );
+                                            });
+                                          },
+                                          icon: const Icon(Icons.copy),
+                                          color: Colors.orange.shade100,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                          const Divider(height: 1, color: Colors.black45),
-                        ],
-                      );
-                    },
-                    itemCount: snapAr.length);
-              }
-              return const Center(
-                child: CupertinoActivityIndicator(),
-              );
-            }),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 1, color: Colors.black45),
+                    ],
+                  );
+                },
+                itemCount: snapAr!.length);
+          },
+        ),
       ),
     );
   }

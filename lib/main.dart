@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:surah/Cubit/cubit/text_cubit.dart';
 import 'package:surah/screens/home_page.dart';
+import 'package:surah/screens/title_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => TextCubit()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,13 +21,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         highlightColor: Colors.green[900],
         primarySwatch: Colors.green,
+        primaryColor: Colors.orange.shade100,
       ),
-      home: HomePage(),
+      home: const TitleSceen(assetPath: 'assets/json/lottie.json'),
     );
   }
 }
