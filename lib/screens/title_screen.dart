@@ -25,7 +25,7 @@ class _TitleSceenState extends State<TitleSceen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).primaryColor,
         body: Center(
           child: Lottie.asset(widget.assetPath),
         ));
