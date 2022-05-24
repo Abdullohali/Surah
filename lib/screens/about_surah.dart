@@ -22,7 +22,7 @@ class AboutSurah extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               aboutSurah,
-              style: TextStyle(fontSize: 20),
+               style:const TextStyle(fontSize: 20),
             ),
           ),
           Padding(
@@ -44,6 +44,7 @@ class AboutSurah extends StatelessWidget {
           ),
         ],
       ),
+      
       backgroundColor: Colors.orange.shade100,
     );
   }

@@ -27,7 +27,6 @@ class _HomePageState extends State<HomePage> {
   Duration position = Duration.zero;
   List<SurahArabic>? snapAr;
   List<SurahModelUzbek>? snapUz;
-
   @override
   void initState() {
     super.initState();
@@ -89,7 +88,7 @@ class _HomePageState extends State<HomePage> {
                                       height: 250,
                                       child: ListView.builder(
                                         shrinkWrap: true,
-                                        physics: BouncingScrollPhysics(),
+                                        physics: const BouncingScrollPhysics(),
                                         scrollDirection: Axis.vertical,
                                         itemBuilder: (context, index) {
                                           return ListTile(
@@ -142,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                                       height: 300,
                                       child: ListView.builder(
                                         shrinkWrap: true,
-                                        physics: BouncingScrollPhysics(),
+                                        physics: const BouncingScrollPhysics(),
                                         scrollDirection: Axis.vertical,
                                         itemBuilder: (context, index) {
                                           return ListTile(
@@ -364,6 +363,75 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
+      floatingActionButton: Container(
+        height: 110,
+        margin: const EdgeInsets.only(left: 30),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        width: double.infinity,
+        child: Column(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                    value: position.inSeconds.toDouble(),
+                    min: 0.0,
+                    max: duration.inSeconds.toDouble(),
+                    onChanged: (double value) {
+                      setState(() {
+                        seekToSecond(value.toInt());
+                        value = value;
+                      });
+                    }),
+                Padding(
+                  padding:const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(position.toString().split('.').first),
+                      Text(duration.toString().split('.').first),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            CircleAvatar(
+              backgroundColor: Colors.green[900],
+              child: IconButton(
+                color: Theme.of(context).primaryColor,
+                onPressed: () async {
+                  if (plays) {
+                    await audioPlayer.pause().then((value) => setState(() {
+                          plays = plays ? false : true;
+                        }));
+                  } else {
+                    String url = "https://server8.mp3quran.net/afs/002.mp3";
+                    await audioPlayer.play(url).then(
+                          (value) => setState(
+                            () {
+                              plays = plays ? false : true;
+                            },
+                          ),
+                        );
+                  }
+                },
+                icon: plays
+                    ? const Icon(Icons.pause)
+                    : const Icon(Icons.play_arrow),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  void seekToSecond(int second) {
+    Duration newDuration = Duration(seconds: second);
+
+    audioPlayer.seek(newDuration);
   }
 }
