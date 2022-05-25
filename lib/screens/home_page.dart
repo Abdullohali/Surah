@@ -188,6 +188,59 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       });
+                }else if (e == 5) {
+                    showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return BottomSheet(
+                          onClosing: () {},
+                          builder: (BuildContext context) {
+                            return BlocBuilder<TextCubit, double>(
+                                builder: (context, state) {
+                              return SizedBox(
+                                height: 300,
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 300,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: const BouncingScrollPhysics(),
+                                        scrollDirection: Axis.vertical,
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            title: Text(
+                                              textSizeTranskripsiya[index][0],
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      textSizeTranskripsiya[index][1]),
+                                            ),
+                                            trailing: Text(
+                                              textSizeTranskripsiya[index][1]
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      textSizeTranskripsiya[index][1]),
+                                            ),
+                                            onTap: () {
+                                              context
+                                                  .read<TextCubit>()
+                                                  .setTranskripsiya(
+                                                      textSizeTranskripsiya[index][1]);
+                                            },
+                                          );
+                                        },
+                                        itemCount: textSizeArabic.length,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            });
+                          });
+                    },
+                  );
                 }
               },
               itemBuilder: (context) => [
@@ -206,6 +259,10 @@ class _HomePageState extends State<HomePage> {
                     const PopupMenuItem(
                       child: Text("Арабий хажми "),
                       value: 3,
+                    ),
+                    const PopupMenuItem(
+                      child: Text("Транскрипсия хажми "),
+                      value: 5,
                     )
                   ])
         ],
@@ -244,7 +301,7 @@ class _HomePageState extends State<HomePage> {
                                       Fluttertoast.showToast(
                                         msg: "Copied",
                                         toastLength: Toast.LENGTH_LONG,
-                                        fontSize: cubit.Arfontsize,
+                                        fontSize: cubit.arfontsize,
                                       );
                                     });
                                   },
@@ -259,16 +316,24 @@ class _HomePageState extends State<HomePage> {
                               child: SelectableText(
                                 snapAr![__].text.toString(),
                                 style: TextStyle(
-                                  fontSize: cubit.Arfontsize,
+                                  fontSize: cubit.arfontsize,
                                 ),
                                 textAlign: TextAlign.end,
                               ),
                             ),
                             const SizedBox(height: 10),
                             SelectableText(
+                              snapUz![__].chapter.toString(),
+                              style: TextStyle(
+                                  fontSize: cubit.transkripsiyasize,
+                                  color: Colors.black.withOpacity(0.5)),
+                                  textAlign: TextAlign.start,
+                            ),
+                            const SizedBox(height: 10),
+                            SelectableText(
                               snapUz![__].text.toString(),
                               style: TextStyle(
-                                fontSize: cubit.Uzfontsize,
+                                fontSize: cubit.uzfontsize,
                               ),
                             ),
                             const SizedBox(height: 10),
@@ -387,7 +452,7 @@ class _HomePageState extends State<HomePage> {
                       });
                     }),
                 Padding(
-                  padding:const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

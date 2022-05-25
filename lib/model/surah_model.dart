@@ -17,7 +17,7 @@ class SurahModelUzbek {
     this.text,
   });
 
-  int? chapter;
+  String? chapter;
   int? verse;
   String? text;
 
