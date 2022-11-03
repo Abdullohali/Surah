@@ -1,4 +1,4 @@
-package com.example.surah
+package com.abdulloh_foziljonov.surah
 
 import io.flutter.embedding.android.FlutterActivity
 

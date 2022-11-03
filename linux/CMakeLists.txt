@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
 set(BINARY_NAME "surah")
-set(APPLICATION_ID "com.example.surah")
+set(APPLICATION_ID "com.abdulloh_foziljonov.surah")
 
 cmake_policy(SET CMP0063 NEW)
 

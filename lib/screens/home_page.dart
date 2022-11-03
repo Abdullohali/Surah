@@ -27,13 +27,14 @@ class _HomePageState extends State<HomePage> {
   Duration position = Duration.zero;
   List<SurahArabic>? snapAr;
   List<SurahModelUzbek>? snapUz;
+
   @override
   void initState() {
     super.initState();
     snapAr = Arabic.map((e) => SurahArabic.fromJson(e)).toList();
     snapUz = surah.map((e) => SurahModelUzbek.fromJson(e)).toList();
     audioPlayer.onPlayerStateChanged.listen((event) {
-      plays = event == PlayerState.PLAYING;
+      plays = event == PlayerState.playing;
     });
 
     audioPlayer.onDurationChanged.listen((event) {
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage> {
       });
     });
 
-    audioPlayer.onAudioPositionChanged.listen((event) {
+    audioPlayer.onPositionChanged.listen((event) {
       setState(() {
         position = event;
       });
@@ -188,8 +189,8 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       });
-                }else if (e == 5) {
-                    showModalBottomSheet<void>(
+                } else if (e == 5) {
+                  showModalBottomSheet<void>(
                     context: context,
                     isScrollControlled: true,
                     builder: (BuildContext context) {
@@ -214,20 +215,23 @@ class _HomePageState extends State<HomePage> {
                                               textSizeTranskripsiya[index][0],
                                               style: TextStyle(
                                                   fontSize:
-                                                      textSizeTranskripsiya[index][1]),
+                                                      textSizeTranskripsiya[
+                                                          index][1]),
                                             ),
                                             trailing: Text(
                                               textSizeTranskripsiya[index][1]
                                                   .toString(),
                                               style: TextStyle(
                                                   fontSize:
-                                                      textSizeTranskripsiya[index][1]),
+                                                      textSizeTranskripsiya[
+                                                          index][1]),
                                             ),
                                             onTap: () {
                                               context
                                                   .read<TextCubit>()
                                                   .setTranskripsiya(
-                                                      textSizeTranskripsiya[index][1]);
+                                                      textSizeTranskripsiya[
+                                                          index][1]);
                                             },
                                           );
                                         },
@@ -327,7 +331,7 @@ class _HomePageState extends State<HomePage> {
                               style: TextStyle(
                                   fontSize: cubit.transkripsiyasize,
                                   color: Colors.black.withOpacity(0.5)),
-                                  textAlign: TextAlign.start,
+                              textAlign: TextAlign.start,
                             ),
                             const SizedBox(height: 10),
                             SelectableText(
@@ -379,7 +383,7 @@ class _HomePageState extends State<HomePage> {
                                             } else {
                                               String url =
                                                   snapAr![__].audio.toString();
-                                              await audioPlayer.play(url).then(
+                                              await audioPlayer.play(UrlSource(url)).then(
                                                     (value) => setState(
                                                       () {
                                                         plays = plays
@@ -474,7 +478,7 @@ class _HomePageState extends State<HomePage> {
                         }));
                   } else {
                     String url = "https://server8.mp3quran.net/afs/002.mp3";
-                    await audioPlayer.play(url).then(
+                    await audioPlayer.play(UrlSource(url)).then(
                           (value) => setState(
                             () {
                               plays = plays ? false : true;
